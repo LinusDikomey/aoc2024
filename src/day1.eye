@@ -1,3 +1,4 @@
+use std.sort
 
 main :: fn {
     input := std.file.read_to_string("input/day1.txt")
@@ -30,24 +31,4 @@ main :: fn {
     }
     print("Part 2: ")
     println(x)
-}
-
-abs :: fn(x i64) -> i64: if x < 0: -x else x
-
-sort :: fn(l *List[u64]) {
-    if l.len < 2: ret
-    i := 0
-    while i < l.len {
-        j := 0
-        while j < l.len - 1 - i {
-            a := l.get(j)
-            b := l.get(j+1)
-            if a > b {
-                l.put(j+1, a)
-                l.put(j, b)
-            }
-            j += 1
-        }
-        i += 1
-    }
 }
