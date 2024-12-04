@@ -14,18 +14,7 @@ main :: fn {
             d := 0
             while d < 8 {
                 dir := directions[d]
-                i := 0
-                while i < m.len {
-                    xo := x as i32 + dir.0 * i as i32
-                    yo := y as i32 + dir.1 * i as i32
-                    if xo >= 0 and xo < lines.get(0).len as i32 and yo >= 0 and yo < lines.len as i32 {
-                        if m.byte(i) == lines.get(yo as u64).byte(xo as u64): i += 1
-                        else i = m.len + 1
-                    } else i = m.len + 1
-                }
-                if i == m.len {
-                    part1 += 1
-                }
+                if check_word_in_dir(&lines, x, y, dir, "XMAS"): part1 += 1
                 d += 1
             }
             i := 0
@@ -48,51 +37,30 @@ main :: fn {
             while d < 4 {
                 dir := directions[d]
                 i := 0
-                while i < m.len {
-                    xo := x as i32 + dir.0 * (i as i32 - 1)
-                    yo := y as i32 + dir.1 * (i as i32 - 1)
-                    if xo >= 0 and xo < lines.get(0).len as i32 and yo >= 0 and yo < lines.len as i32 {
-                        if m.byte(i) == lines.get(yo as u64).byte(xo as u64): i += 1
-                        else i = m.len + 1
-                    } else i = m.len + 1
-                }
-                if i == m.len {
+                if check_word_in_dir(&lines, x, y, dir, "MAS", offset: -1) and (
+                    check_word_in_dir(&lines, x, y, (-dir.0, dir.1), "MAS", offset: -1) 
+                    or check_word_in_dir(&lines, x, y, (dir.0, -dir.1), "MAS", offset: -1) 
+                ) {
+                    part2 += 1
                     d = 5
-                    i := 0
-                    {
-                        dir: (i32, i32) = (dir.0, if dir.1 == 1: -1 else 1)
-                        while i < m.len {
-                            xo := x as i32 + dir.0 * (i as i32 - 1)
-                            yo := y as i32 + dir.1 * (i as i32 - 1)
-                            if xo >= 0 and xo < lines.get(0).len as i32 and yo >= 0 and yo < lines.len as i32 {
-                                if m.byte(i) == lines.get(yo as u64).byte(xo as u64): i += 1
-                                else i = m.len + 1
-                            } else i = m.len + 1
-                        }
-                    }
-                    if i == m.len {
-                        part2 += 1
-                    } else {
-                        dir: (i32, i32) = (if dir.0 == 1: -1 else 1, dir.1)
-                        i := 0
-                        while i < m.len {
-                            xo := x as i32 + dir.0 * (i as i32 - 1)
-                            yo := y as i32 + dir.1 * (i as i32 - 1)
-                            if xo >= 0 and xo < lines.get(0).len as i32 and yo >= 0 and yo < lines.len as i32 {
-                                if m.byte(i) == lines.get(yo as u64).byte(xo as u64): i += 1
-                                else i = m.len + 1
-                            } else i = m.len + 1
-                        }
-                        if i == m.len: part2 += 1
-                    }
-                }
-                d += 1
+                } else d += 1
             }
-            i := 0
-            
             x += 1
         }
         y += 1
     }
     println(part2)
+}
+
+check_word_in_dir :: fn(lines *List[str], x u64, y u64, dir (i32, i32), word str, offset i32 = 0) -> bool {
+    i := 0
+    while i < word.len {
+        xo := x as i32 + dir.0 * (i as i32 + offset)
+        yo := y as i32 + dir.1 * (i as i32 + offset)
+        if xo >= 0 and xo < lines.get(0).len as i32 and yo >= 0 and yo < lines.len as i32 {
+            if word.byte(i) == lines.get(yo as u64).byte(xo as u64): i += 1
+            else ret false
+        } else ret false
+    }
+    ret true
 }
