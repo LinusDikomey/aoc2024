@@ -11,52 +11,32 @@ fn main() {
             )
         })
         .collect();
-    let part1: i64 = input
-        .iter()
-        .filter(|(x, ns)| {
-            let s = (0..(2usize.pow(ns.len() as u32 - 1))).any(|p| {
-                let mut i = 0;
-                ns.iter()
-                    .copied()
-                    .reduce(|a, b| {
-                        let f = [Add::add, Mul::mul][(p >> i) & 1];
-                        i += 1;
-                        f(a, b)
-                    })
-                    .unwrap()
-                    == *x
-            });
-            s
-        })
-        .map(|(x, _)| x)
-        .sum();
-    println!("part1: {part1}");
-
-    let part2: i64 = input
-        .iter()
-        .filter(|(x, ns)| {
-            let s = (0..(3usize.pow(ns.len() as u32 - 1))).any(|mut p| {
-                ns.iter()
-                    .copied()
-                    .reduce(|a, b| {
-                        let o = p % 3;
-                        p /= 3;
-                        let f = [Add::add, Mul::mul, |a: i64, b: i64| {
-                            (a.to_string() + &b.to_string()).parse().unwrap()
-                        }][o];
-                        f(a, b)
-                    })
-                    .unwrap()
-                    == *x
-            });
-            s
-        })
-        .map(|(x, _)| x)
-        .sum();
-    println!("part2: {part2}");
+    println!("part1: {}", solve(&input, &[Add::add, Mul::mul]));
+    println!("part2: {}", solve(&input, &[Add::add, Mul::mul, concat]));
 }
 
-enum Op {
-    Add,
-    Mul,
+fn concat(x: i64, y: i64) -> i64 {
+    format!("{x}{y}").parse().unwrap()
+}
+
+fn solve(input: &[(i64, Vec<i64>)], fns: &[fn(i64, i64) -> i64]) -> i64 {
+    input
+        .iter()
+        .filter(|(x, ns)| {
+            let s = (0..(fns.len().pow(ns.len() as u32 - 1))).any(|mut p| {
+                ns.iter()
+                    .copied()
+                    .reduce(|a, b| {
+                        let o = p % fns.len();
+                        p /= fns.len();
+                        let f = fns[o];
+                        f(a, b)
+                    })
+                    .unwrap()
+                    == *x
+            });
+            s
+        })
+        .map(|(x, _)| x)
+        .sum()
 }
