@@ -1,0 +1,8 @@
+[package]
+name = "day11"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+aoch = { git = "https://github.com/LinusDikomey/aoch", version = "0.1.0" }
+indicatif = "0.17.9"
