@@ -1,58 +1,44 @@
-use std::collections::HashMap;
-
-use aoch::{int, ints};
-use indicatif::ProgressIterator;
+use aoch::ints;
+use std::{collections::HashMap, time::Instant};
 
 fn main() {
     let input = ints(include_str!("../../input/day11.txt"));
-    let mut part1 = input.clone();
-    for _ in (0..25).progress() {
-        step(&mut part1);
-    }
-    println!("Part 1: {}", part1.len());
+    let start = Instant::now();
+    let part1 = solve(&input, 25);
+    let part2 = solve(&input, 75);
+    dbg!(start.elapsed());
+    println!("Part 1: {part1}");
+    println!("Part 2: {part2}");
+}
+
+fn solve(input: &[i64], steps: usize) -> u64 {
     let mut m: HashMap<i64, u64> = HashMap::new();
-    for item in input {
+    let mut m2 = HashMap::new();
+    for &item in input {
         *m.entry(item).or_default() += 1;
     }
-    for _ in (0..75).progress() {
-        let mut m2 = HashMap::new();
-        for (s, count) in m {
+    for _ in 0..steps {
+        for (s, count) in m.drain() {
             let (a, b) = stone(s);
             *m2.entry(a).or_default() += count;
             if let Some(b) = b {
                 *m2.entry(b).or_default() += count;
             }
         }
-        m = m2;
+        std::mem::swap(&mut m, &mut m2);
+        m2.clear();
     }
-    println!("Part 2: {}", m.values().copied().sum::<u64>());
-}
-
-fn step(input: &mut Vec<i64>) {
-    let mut i = 0;
-    while i < input.len() {
-        i += match stone(input[i]) {
-            (a, Some(b)) => {
-                input[i] = a;
-                input.insert(i + 1, b);
-                2
-            }
-            (a, None) => {
-                input[i] = a;
-                1
-            }
-        }
-    }
+    m.values().copied().sum::<u64>()
 }
 
 fn stone(stone: i64) -> (i64, Option<i64>) {
     match stone {
         0 => (1, None),
         n => {
-            let s = n.to_string();
-            if s.len() % 2 == 0 {
-                let (l, r) = s.split_at(s.len() / 2);
-                (int(l), Some(int(r)))
+            let digits = n.ilog10() + 1;
+            if digits % 2 == 0 {
+                let divider = 10i64.pow(digits / 2);
+                (n / divider, Some(n % divider))
             } else {
                 (stone * 2024, None)
             }
