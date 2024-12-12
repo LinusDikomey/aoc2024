@@ -5,7 +5,7 @@ version = 4
 [[package]]
 name = "aoch"
 version = "0.1.0"
-source = "git+https://github.com/LinusDikomey/aoch#34fb05c1d7556da8036bb46ccc7e4d3de17c4d56"
+source = "git+https://github.com/LinusDikomey/aoch#5b01e2d80e7866a55148e44651381eeb9879c19a"
 dependencies = [
  "color-format",
  "itertools",
